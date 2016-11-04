@@ -27,14 +27,14 @@
                     "{{password}}": "password",
                     "{{serverIp}}": "127.0.0.1",
                     "{{port}}": "3306",
-                    "{{dbName}}": "{{appName}}",
+                    "{{dbName}}": "{{appId}}",
                     "{{charset}}": "utf8mb4"
                 }
             }
         },
         "dbConnectDevelop": {
             "title": "数据库连接（开发环境）",
-            "value": "sqlite:///.{{appName}}.db"
+            "value": "sqlite:///.{{appId}}.db"
         }
     },
     "replace": [
