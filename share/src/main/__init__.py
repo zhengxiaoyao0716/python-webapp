@@ -19,18 +19,10 @@ Config.init(app)
 URL_PREFIX = Config.APPLICATION_ROOT
 
 
-def _get_data(key):
-    if key in g.data:
-        return g.data[key]
-    else:
-        return None
-
-
 @app.before_request
 def bind_data():
     """绑定请求数据"""
     g.data = request.json or request.form or request.args
-    g.get_data = _get_data
 
 
 @app.teardown_appcontext
