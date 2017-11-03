@@ -14,7 +14,7 @@ def immediate(*args, **kwargs):
 
 NAME = 'name'
 VERSION = 'v1'
-MODULES = ['api', 'view']
+MODULES = ['api', 'guide', 'user', 'view']
 
 
 @immediate()

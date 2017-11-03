@@ -22,7 +22,7 @@ def before_request():
 def pull_time():
     """拉取当前时间"""
     if False:
-        return "Error reason."
+        return "Error reason.", 403
     now = str(datetime.datetime.now())
     LOGGER.info('/api/time/pull %s', now)
     return jsonify({'now': now})

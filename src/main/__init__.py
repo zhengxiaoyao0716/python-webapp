@@ -4,7 +4,6 @@
 flask server
 """
 
-
 from flask import Flask, request, g
 
 from project import immediate, NAME, SECRET_KEY, MODULES, DB, LOGGER

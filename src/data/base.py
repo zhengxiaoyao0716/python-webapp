@@ -8,7 +8,7 @@ from datetime import timedelta, datetime
 from sqlalchemy.ext.declarative import declarative_base as _base
 from sqlalchemy import (  # noqa: F401
     Column, Integer, String, Text, Boolean,
-    ForeignKey,
+    or_, ForeignKey, Table,
 )
 from sqlalchemy.orm import relationship  # noqa: F401
 
