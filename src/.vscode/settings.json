@@ -1,0 +1,4 @@
+{
+    "python.pythonPath": ".\\.env\\Scripts\\python",
+    "python.linting.flake8Path": ".\\.env\\Scripts\\flake8"
+}
