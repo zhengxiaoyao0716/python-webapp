@@ -8,16 +8,20 @@ import os
 os.sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 
+def init_test_data():
+    drop_all()
+    create_all()
+    DB.session.commit()
+
+
 if __name__ == '__main__':
     import webbrowser
 
     from project import NAME, DB
-    from dao import drop_all, create_all
     from main import app
+    from dao import drop_all, create_all
 
-    drop_all()
-    create_all()
-    DB.session.commit()
+    init_test_data()
 
     app.config.update(
         DEBUG=True,

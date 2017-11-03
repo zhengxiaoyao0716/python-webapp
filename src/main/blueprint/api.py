@@ -7,6 +7,8 @@
 import datetime
 from flask import Blueprint, jsonify
 
+from project import LOGGER
+
 blueprint = Blueprint('api', __name__)
 
 
@@ -21,7 +23,6 @@ def pull_time():
     """拉取当前时间"""
     if False:
         return "Error reason."
-    return jsonify({
-        'now': str(datetime.datetime.now()),
-        'ch': '中文'
-    })
+    now = str(datetime.datetime.now())
+    LOGGER.info('/api/time/pull %s', now)
+    return jsonify({'now': now})

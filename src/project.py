@@ -12,17 +12,9 @@ def immediate(*args, **kwargs):
     return decorate
 
 
-@immediate('project.json')
-def _read_config(path):
-    global NAME
-    global VERSION
-    global MODULES
-    from json import load
-    with open(path) as f:
-        config = load(f)
-        NAME = config['name']
-        VERSION = config['version']
-        MODULES = config['modules']
+NAME = 'name'
+VERSION = 'v1'
+MODULES = ['api', 'view']
 
 
 @immediate()
@@ -47,4 +39,30 @@ def _init_database(db_connect):
     session = scoped_session(sessionmaker(
         autocommit=False, autoflush=False, bind=engine))
     session.commit()
-    DB = namedtuple('_DB', ('engine', 'session'))(engine, session)
+    DB = namedtuple('DB', ('engine', 'session'))(engine, session)
+
+
+@immediate()
+def _init_logger():
+    global LOGGER
+
+    class Logger(object):
+        def __init__(self, logger):
+            self.logger = logger
+
+        def warning(self, *args, **kwargs):
+            self.logger.warning(*args, **kwargs)
+
+        def error(self, *args, **kwargs):
+            self.logger.error(*args, **kwargs)
+
+        def info(self, *args, **kwargs):
+            self.logger.info(*args, **kwargs)
+
+        def set_logger(self, logger):
+            self.logger = logger
+    LOGGER = Logger(type('Logger', (object,), {
+        'warning': print,
+        'error': print,
+        'info': print,
+    }))

@@ -7,7 +7,7 @@ flask server
 
 from flask import Flask, request, g
 
-from project import immediate, NAME, SECRET_KEY, MODULES, DB
+from project import immediate, NAME, SECRET_KEY, MODULES, DB, LOGGER
 
 app = Flask(__name__)
 app.template_folder = '../html'
@@ -16,6 +16,7 @@ app.config.update(
     SECRET_KEY=SECRET_KEY,
     APPLICATION_ROOT='/%s' % NAME,
 )
+LOGGER.set_logger(app.logger)
 
 
 @app.before_request
