@@ -23,7 +23,7 @@ if __name__ == '__main__':
     import webbrowser
     from flask import session  # flake8: noqa
 
-    from project import NAME, VERSION, DB
+    from project import APP_ROOT, SOCKETIO, DB
     from main import app
     from data import drop_all, create_all
 
@@ -38,14 +38,18 @@ if __name__ == '__main__':
     def add_debug_ctx():
         """添加调试上下文"""
         # session['user'] = 1
-    # webbrowser.open('http://localhost:5000/%s/%s/view' % (NAME, VERSION))
-    app.run(host='0.0.0.0')
+    webbrowser.open('http://localhost:5000%s/view' % APP_ROOT)
+    if SOCKETIO:
+        from main.socket import socketio
+        socketio.run(app, host='0.0.0.0')
+    else:
+        app.run(host='0.0.0.0')
 
 
 def init_requests():
     from requests import session
-    from project import NAME, VERSION
-    API = 'http://localhost:5000/%s/%s' % (NAME, VERSION)
+    from project import APP_ROOT
+    API = 'http://localhost:5000' + APP_ROOT
     self = session()
     global get
     global post

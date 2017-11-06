@@ -1,4 +1,10 @@
+flask
 sqlalchemy
 PyMySQL
-flask
 passlib
+flask-socketio
+
+# dev
+flake8
+ipython
+requests

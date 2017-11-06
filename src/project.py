@@ -1,8 +1,32 @@
 # -*- coding: utf-8 -*-
 
-"""
-Project define.
-"""
+NAME = 'project'  # $项目名称
+VERSION = 'v1'  # $版本号
+
+if __name__ == '__main__':
+    from os import environ, path, rename, remove
+    from re import match
+    producers = {
+        'NAME': lambda v: v,
+        'VERSION': lambda v: 'v%d' % (1 + int(v[1:])),
+    }
+    src = environ.get('SRC', '')
+    raw_path = path.join(src, 'project.py')
+    new_path = path.join(src, 'project.py.new')
+    with open(raw_path, 'r', encoding='utf-8') as raw_file, \
+            open(new_path, 'w', encoding='utf-8') as new_file:
+        for line in raw_file.readlines():
+            m = match('^(\w+) = \'(\w+)\'  # \$(\w+)$', line)
+            if not m:
+                new_file.write(line)
+                continue
+            name, value, comment = m.groups()
+            value = producers[name](value)
+            print(comment + '(%s):' % value, flush=True)
+            new_value = input('> ') or value
+            new_file.write("%s = '%s'  # $%s\n" % (name, new_value, comment))
+    remove(raw_path)
+    rename(new_path, raw_path)
 
 
 def immediate(*args, **kwargs):
@@ -12,16 +36,13 @@ def immediate(*args, **kwargs):
     return decorate
 
 
-NAME = 'name'
-VERSION = 'v1'
-MODULES = ['guide', 'user', 'view']
-
-
 @immediate()
 def _environ_variables():
+    global APP_ROOT
     global SECRET_KEY
     global DB_CONNECT
     from os import environ
+    APP_ROOT = environ.get('APP_ROOT', '/%s/%s' % (NAME, VERSION))
     SECRET_KEY = environ.get('SECRET_KEY', 'SECRET_KEY')
     # mysql+pymysql://{{account}}:{{password}}@{{serverIp}}:{{port}}/{{dbName}}?charset={{charset}}
     DB_CONNECT = environ.get('DB_CONNECT', 'sqlite:///.%s.db' % NAME)
@@ -61,6 +82,7 @@ def _init_logger():
 
         def set_logger(self, logger):
             self.logger = logger
+            # TODO 行数还原
     LOGGER = Logger(type('Logger', (object,), {
         'warning': print,
         'error': print,
@@ -68,6 +90,7 @@ def _init_logger():
     }))
 
 
+MODULES = ['guide', 'user', 'view']
 CODE_USAGE = {
     '/guide/password/reset': {
         'text': '重置密码',
@@ -78,3 +101,4 @@ CODE_USAGE = {
         'expiry': 3 * 60,
     },
 }
+SOCKETIO = True

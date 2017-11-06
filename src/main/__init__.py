@@ -6,14 +6,19 @@ flask server
 
 from flask import Flask, request, g
 
-from project import immediate, NAME, VERSION, SECRET_KEY, MODULES, DB, LOGGER
+from project import (
+    immediate,
+    APP_ROOT, SECRET_KEY,
+    MODULES, SOCKETIO,
+    DB, LOGGER
+)
 
 app = Flask(__name__)
 app.template_folder = '../html'
 app.static_folder = '../html/static'
 app.config.update(
     SECRET_KEY=SECRET_KEY,
-    APPLICATION_ROOT='/%s/%s/' % (NAME, VERSION),
+    APPLICATION_ROOT=APP_ROOT + '/',
 )
 LOGGER.set_logger(app.logger)
 
@@ -43,4 +48,13 @@ def _reg_blueprints(*names):
         bp = main.blueprint.__dict__[name].blueprint
         bp.static_folder = '../../html/static'
         app.register_blueprint(
-            bp, url_prefix='/%s/%s/%s' % (NAME, VERSION, name))
+            bp, url_prefix='%s/%s' % (APP_ROOT, name))
+
+
+@immediate()
+def _reg_socketio():
+    """注入socketio"""
+    if not SOCKETIO:
+        return
+    from main.socket import socketio
+    socketio.init_app(app, path=APP_ROOT + '/socket.io')

@@ -13,4 +13,4 @@ if exist "%SRC%\.env" (
 echo.
 echo install requirements.
 %SRC%\.env\Scripts\pip install -r %SRC%\script\requirements.txt
-%SRC%\.env\Scripts\pip install flake8 ipython requests
+%SRC%\.env\Scripts\python %SRC%\project.py

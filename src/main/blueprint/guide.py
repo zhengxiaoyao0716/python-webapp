@@ -16,11 +16,7 @@ blueprint = Blueprint('guide', __name__)
 @blueprint.route('/time/pull')
 def pull_time():
     """拉取当前时间"""
-    if False:
-        return "Error reason.", 403
-    now = get_time()
-    LOGGER.info('/api/time/pull %s', now)
-    return jsonify({'now': now})
+    return jsonify({'now': get_time()})
 
 
 @blueprint.route('/login', methods=['POST'])

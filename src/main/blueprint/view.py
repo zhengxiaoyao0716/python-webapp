@@ -6,6 +6,8 @@
 
 from flask import Blueprint, render_template
 
+from project import NAME, APP_ROOT
+
 blueprint = Blueprint('view', __name__)
 
 
@@ -19,4 +21,4 @@ def before_request():
 @blueprint.route('/index.html')
 def index():
     """索引页"""
-    return render_template('index.html')
+    return render_template('index.html', NAME=NAME, APP_ROOT=APP_ROOT)
