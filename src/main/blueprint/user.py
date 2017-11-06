@@ -40,7 +40,7 @@ def destroy():
     err = check_code(g.user, '/user/destroy', g.data['code'])
     if err:
         return err, 403
-    DB.session.delete(g.user)
+    g.user.destroy()
     return logout()
 
 

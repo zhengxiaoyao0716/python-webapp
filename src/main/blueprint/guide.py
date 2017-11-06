@@ -72,9 +72,14 @@ def get_verify_code():
         user = User.append(account, None, None, email=email, phone=phone)
     DB.session.flush()
 
+    extend = user.extend()
+    _, expiry = extend \
+        .pop(usage, '0,-1').split(',')
+    if expiry > get_time():
+        return '请求验证码过于频繁，请稍候再试', 403
     code = rand_code()
     user.extend({
-        **user.extend(),
+        **extend,
         usage: code + ',' + get_time(second=conf['expiry']),
     })
     # TODO 发送验证码

@@ -77,7 +77,7 @@ def test_verify():
     usage = '/user/destroy'
     get_verify_code(usage, account, phone=phone)
     post('/guide/login',
-         {'account': 'test_verify', 'password': 'password'})
+         {'account': account, 'password': 'password'})
     code = input('code:')
     post(usage, {'code': code})
 

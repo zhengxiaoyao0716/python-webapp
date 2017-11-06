@@ -14,7 +14,7 @@ from itsdangerous import \
 
 from project import SECRET_KEY
 from .base import (
-    Base,
+    DB, Base,
     Column, Integer, String,
     or_, ForeignKey,
 )
@@ -123,12 +123,21 @@ class User(Base):
         extend = UserExtend.query.filter(
             UserExtend.user_id == self.id
         ).one_or_none()
-        if not data:
+        if data is None:
             return extend.data if extend else {}
         if not extend:
             extend = UserExtend.append(self.id, data)
         else:
             extend.data = data
+
+    def destroy(self):
+        """
+        销毁帐号
+        请不要试图进行复杂的级联配置，
+        所有与帐号关联字段应当显式的销毁
+        """
+        UserExtend.query.filter(UserExtend.user_id == self.id).delete()
+        DB.session.delete(self)
 
 
 class UserExtend(Base):
