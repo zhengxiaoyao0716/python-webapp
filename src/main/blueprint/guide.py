@@ -6,7 +6,9 @@
 
 from flask import Blueprint, g, request, session, jsonify, make_response
 
+from project import LOGGER
 from data import DB, User
+from util import rand_code, get_time
 
 blueprint = Blueprint('guide', __name__)
 
@@ -30,9 +32,21 @@ def login_user():
     return resp
 
 
+CODE_USAGE = {
+    '/guide/password/reset': '重置密码'
+}
+
+
 @blueprint.route('/verify_code/get', methods=['POST'])
 def get_verify_code():
-    """获取验证码（副作用为创建User）"""
+    """
+    获取验证码
+    : 若用户存在，则至少要通过邮箱或手机进行一次匹配
+    : 若用户不存在，创建不可登录用户（无密码未激活）
+    """
+    usage = g.data['usage']
+    if usage not in CODE_USAGE:
+        return 'usage参数无效: %s' % usage, 400
     account = g.data['account']
     user = User.query \
         .filter(User.account == account) \
@@ -52,36 +66,37 @@ def get_verify_code():
         user = User.append(account, None, None, email=email, phone=phone)
     DB.session.flush()
 
+    code = rand_code()
+    user.extend({
+        **user.extend(),
+        usage: code + ',' + get_time(second=3 * 60),
+    })
     # TODO 发送验证码
-    # user.set_password(code)
+    LOGGER.info('%s %d %s', usage, user.id, code)
     if email:
         pass
     if phone:
         pass
 
-    resp = make_response('fin')
-    resp.set_cookie('verify_user', str(user.id))
-    resp.set_cookie('verify_email', email or user.email)
-    resp.set_cookie('verify_phone', phone or user.phone)
-    return resp
+    return 'fin'
 
 
 @blueprint.route('/password/reset', methods=['POST'])
 def reset_password():
-    """重置密码（副作用可以创建User）"""
-    user = User.query.get(request.cookies.get('verify_user'))
+    """
+    重置密码
+    : 若帐号未激活，则直接设置为新密码并激活
+    """
+    user = User.query.filter(User.account == g.data['account']).one_or_none()
     if not user:
-        return '设置密码失败，无效的cookie或已过期', 403
+        return '帐号不存在', 403
+    code, expiry = user.extend() \
+        .get('/guide/password/reset', '0,-1').split(',')
+    if expiry < get_time():
+        return '验证码已过期', 403
     # TODO 校验验证码
-    # if not user.check_password(g.data['code']):
-    #     return '设置密码失败，验证码无效或已过期', 403
+    # if code != g.data['code']:
+    #     return '无效的验证码', 403
 
     user.set_password(g.data['password'])
-    user.email = request.cookies.get('verify_email')
-    user.phone = request.cookies.get('verify_phone')
-
-    resp = make_response('fin')
-    resp.delete_cookie('verify_user')
-    resp.delete_cookie('verify_email')
-    resp.delete_cookie('verify_phone')
-    return resp
+    return 'fin'

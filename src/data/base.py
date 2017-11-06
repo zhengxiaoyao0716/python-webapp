@@ -3,8 +3,6 @@
 数据库基础模板
 """
 
-from datetime import timedelta, datetime
-
 from sqlalchemy.ext.declarative import declarative_base as _base
 from sqlalchemy import (  # noqa: F401
     Column, Integer, String, Text, Boolean,
@@ -13,12 +11,6 @@ from sqlalchemy import (  # noqa: F401
 from sqlalchemy.orm import relationship  # noqa: F401
 
 from project import DB
-
-
-def get_time(delta_day=0, delta_second=0):
-    """获取时间"""
-    return str(datetime.now() + timedelta(delta_day, delta_second))[0:19]
-
 
 Base = _base()
 Base.query = DB.session.query_property()

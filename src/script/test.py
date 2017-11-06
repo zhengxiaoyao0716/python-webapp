@@ -40,3 +40,23 @@ if __name__ == '__main__':
         # session['user'] = 1
     webbrowser.open('http://localhost:5000/%s/view' % NAME)
     app.run(host='0.0.0.0')
+
+
+def requests():
+    from requests import get, post
+    from project import NAME
+    API = 'http://localhost:5000/%s' % NAME
+    return (
+        lambda url, *args, **kwargs: get(API + url, *args, **kwargs),
+        lambda url, *args, **kwargs: post(API + url, *args, **kwargs),
+    )
+
+
+def test_verify():
+    get, post = requests()
+    usage = '/guide/password/reset'
+    account = 'test_verify'
+    phone = '12312341234'
+    post('/guide/verify_code/get',
+         json={'usage': usage, 'account': account, 'phone': phone})
+    post(usage, {'account': account, 'code': None, 'password': 'password'})

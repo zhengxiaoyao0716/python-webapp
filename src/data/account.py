@@ -34,7 +34,7 @@ class User(Base):
     def __init__(self, account, password, name, email=None, phone=None):
         self.account = account
         password and self.set_password(password)
-        self.name = name
+        self.name = name or account
         self.email = email
         self.phone = phone
 
@@ -65,6 +65,8 @@ class User(Base):
 
     def check_password(self, password):
         """检查密码"""
+        if self.secret is None:
+            return '帐号未激活'
         return pwd_context.verify(password, self.secret)
 
     def change_password(self, old_passwd, new_passwd):
@@ -81,8 +83,6 @@ class User(Base):
             self = cls.query.filter(cls.account == account).one_or_none()
             if not self:
                 return None, u'帐号不存在'
-            if not self.user:
-                return None, u'帐号未激活'
             if not self.check_password(password):
                 return None, u'密码错误'
         else:
