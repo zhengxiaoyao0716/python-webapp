@@ -6,15 +6,25 @@
 
 from flask import Blueprint, g, request, session, jsonify, make_response
 
-from project import LOGGER
+from project import LOGGER, CODE_USAGE
 from data import DB, User
-from util import rand_code, get_time
+from util import rand_code, get_time, check_code
 
 blueprint = Blueprint('guide', __name__)
 
 
-@blueprint.route('/user/login', methods=['POST'])
-def login_user():
+@blueprint.route('/time/pull')
+def pull_time():
+    """拉取当前时间"""
+    if False:
+        return "Error reason.", 403
+    now = get_time()
+    LOGGER.info('/api/time/pull %s', now)
+    return jsonify({'now': now})
+
+
+@blueprint.route('/login', methods=['POST'])
+def login():
     """用户登录"""
     user, err = User.login(
         g.data.get('account'),
@@ -32,11 +42,6 @@ def login_user():
     return resp
 
 
-CODE_USAGE = {
-    '/guide/password/reset': '重置密码'
-}
-
-
 @blueprint.route('/verify_code/get', methods=['POST'])
 def get_verify_code():
     """
@@ -44,8 +49,9 @@ def get_verify_code():
     : 若用户存在，则至少要通过邮箱或手机进行一次匹配
     : 若用户不存在，创建不可登录用户（无密码未激活）
     """
-    usage = g.data['usage']
-    if usage not in CODE_USAGE:
+    usage = g.data.get('usage')
+    conf = CODE_USAGE.get(usage)
+    if conf is None:
         return 'usage参数无效: %s' % usage, 400
     account = g.data['account']
     user = User.query \
@@ -69,7 +75,7 @@ def get_verify_code():
     code = rand_code()
     user.extend({
         **user.extend(),
-        usage: code + ',' + get_time(second=3 * 60),
+        usage: code + ',' + get_time(second=conf['expiry']),
     })
     # TODO 发送验证码
     LOGGER.info('%s %d %s', usage, user.id, code)
@@ -88,15 +94,8 @@ def reset_password():
     : 若帐号未激活，则直接设置为新密码并激活
     """
     user = User.query.filter(User.account == g.data['account']).one_or_none()
-    if not user:
-        return '帐号不存在', 403
-    code, expiry = user.extend() \
-        .get('/guide/password/reset', '0,-1').split(',')
-    if expiry < get_time():
-        return '验证码已过期', 403
-    # TODO 校验验证码
-    # if code != g.data['code']:
-    #     return '无效的验证码', 403
-
+    err = check_code(user, '/guide/password/reset', g.data['code'])
+    if err:
+        return err, 403
     user.set_password(g.data['password'])
     return 'fin'

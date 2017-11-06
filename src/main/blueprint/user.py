@@ -7,6 +7,8 @@
 from flask import Blueprint, g, session, make_response, jsonify
 
 from data import User
+from project import DB
+from util import check_code
 
 blueprint = Blueprint('user', __name__)
 
@@ -32,11 +34,21 @@ def logout():
     return resp
 
 
+@blueprint.route('/destroy', methods=['POST'])
+def destroy():
+    """销毁帐号"""
+    err = check_code(g.user, '/user/destroy', g.data['code'])
+    if err:
+        return err, 403
+    DB.session.delete(g.user)
+    return logout()
+
+
 @blueprint.route('/password/update', methods=['POST'])
 def update_password():
     """修改密码"""
-    _, err = g.user.change_password(
-        g.data['oldPasswd'], g.data['newPasswd'])
+    err = g.user.change_password(
+        g.data['old'], g.data['new'])
     if err:
         return err, 403
     return 'fin'

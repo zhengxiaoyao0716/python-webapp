@@ -6,14 +6,14 @@ flask server
 
 from flask import Flask, request, g
 
-from project import immediate, NAME, SECRET_KEY, MODULES, DB, LOGGER
+from project import immediate, NAME, VERSION, SECRET_KEY, MODULES, DB, LOGGER
 
 app = Flask(__name__)
 app.template_folder = '../html'
 app.static_folder = '../html/static'
 app.config.update(
     SECRET_KEY=SECRET_KEY,
-    APPLICATION_ROOT='/%s' % NAME,
+    APPLICATION_ROOT='/%s/%s/' % (NAME, VERSION),
 )
 LOGGER.set_logger(app.logger)
 
@@ -42,4 +42,5 @@ def _reg_blueprints(*names):
         main = __import__('main.blueprint.' + name)
         bp = main.blueprint.__dict__[name].blueprint
         bp.static_folder = '../../html/static'
-        app.register_blueprint(bp, url_prefix='/%s/%s' % (NAME, name))
+        app.register_blueprint(
+            bp, url_prefix='/%s/%s/%s' % (NAME, VERSION, name))

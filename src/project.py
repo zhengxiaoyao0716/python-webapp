@@ -14,7 +14,7 @@ def immediate(*args, **kwargs):
 
 NAME = 'name'
 VERSION = 'v1'
-MODULES = ['api', 'guide', 'user', 'view']
+MODULES = ['guide', 'user', 'view']
 
 
 @immediate()
@@ -66,3 +66,15 @@ def _init_logger():
         'error': print,
         'info': print,
     }))
+
+
+CODE_USAGE = {
+    '/guide/password/reset': {
+        'text': '重置密码',
+        'expiry': 3 * 60,
+    },
+    '/user/destroy': {
+        'text': '销毁帐号',
+        'expiry': 3 * 60,
+    },
+}

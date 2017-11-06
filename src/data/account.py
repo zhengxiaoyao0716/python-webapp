@@ -64,27 +64,32 @@ class User(Base):
         self.secret = pwd_context.encrypt(password)
 
     def check_password(self, password):
-        """检查密码"""
+        """检查密码，return error"""
         if self.secret is None:
-            return '帐号未激活'
-        return pwd_context.verify(password, self.secret)
+            return u'帐号未激活'
+        if not pwd_context.verify(password, self.secret):
+            return u'密码错误'
 
     def change_password(self, old_passwd, new_passwd):
-        """修改密码"""
-        if not self.check_password(old_passwd):
-            return None, u'原密码错误'
+        """修改密码，return error"""
+        err = self.check_password(old_passwd)
+        if err:
+            return err
         self.set_password(new_passwd)
-        return new_passwd, None
 
     @classmethod
     def login(cls, account, password, token=''):
-        """登入"""
+        """
+        登入
+        :return user, error
+        """
         if account and password:
             self = cls.query.filter(cls.account == account).one_or_none()
             if not self:
                 return None, u'帐号不存在'
-            if not self.check_password(password):
-                return None, u'密码错误'
+            err = self.check_password(password)
+            if err:
+                return None, err
         else:
             if not token:
                 return None, u'缺少参数'
