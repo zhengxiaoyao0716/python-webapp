@@ -5,6 +5,7 @@
 """
 
 import os
+from requests import session
 os.sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 
@@ -21,8 +22,6 @@ def init_test_data():
 
 if __name__ == '__main__':
     import webbrowser
-    from flask import session  # flake8: noqa
-
     from project import APP_ROOT, SOCKETIO, DB
     from main import app
     from data import drop_all, create_all
@@ -38,7 +37,7 @@ if __name__ == '__main__':
     def add_debug_ctx():
         """添加调试上下文"""
         # session['user'] = 1
-    webbrowser.open('http://localhost:5000%s/view' % APP_ROOT)
+    webbrowser.open('http://localhost:5000%s/view' % APP_ROOT, new=0)
     if SOCKETIO:
         from main.socket import socketio
         socketio.run(app, host='0.0.0.0')
@@ -47,7 +46,6 @@ if __name__ == '__main__':
 
 
 def init_requests():
-    from requests import session
     from project import APP_ROOT
     API = 'http://localhost:5000' + APP_ROOT
     self = session()

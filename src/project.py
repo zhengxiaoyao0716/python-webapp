@@ -73,22 +73,26 @@ def _init_logger():
         def __init__(self, logger):
             self.logger = logger
 
-        def warning(self, *args, **kwargs):
-            self.logger.warning(*args, **kwargs)
+        @property
+        def error(self): return self.logger.error
 
-        def error(self, *args, **kwargs):
-            self.logger.error(*args, **kwargs)
+        @property
+        def warning(self): return self.logger.warning
 
-        def info(self, *args, **kwargs):
-            self.logger.info(*args, **kwargs)
+        @property
+        def info(self): return self.logger.info
+
+        @property
+        def debug(self): return self.logger.debug
 
         def set_logger(self, logger):
             self.logger = logger
-            # TODO 行数还原
+
     LOGGER = Logger(type('Logger', (object,), {
-        'warning': print,
         'error': print,
+        'warning': print,
         'info': print,
+        'debug': print,
     }))
 
 
