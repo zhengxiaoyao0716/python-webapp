@@ -6,6 +6,7 @@ VERSION = 'v1'  # $版本号
 if __name__ == '__main__':
     from os import environ, path, rename, remove
     from re import match
+    from sys import exit
     producers = {
         'NAME': lambda v: v,
         'VERSION': lambda v: 'v%d' % (1 + int(v[1:])),
@@ -27,6 +28,7 @@ if __name__ == '__main__':
             new_file.write("%s = '%s'  # $%s\n" % (name, new_value, comment))
     remove(raw_path)
     rename(new_path, raw_path)
+    exit(0)
 
 
 def immediate(*args, **kwargs):

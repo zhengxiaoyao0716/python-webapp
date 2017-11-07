@@ -12,5 +12,5 @@ if exist "%SRC%\.env" (
 )
 echo.
 echo install requirements.
-%SRC%\.env\Scripts\pip install -r %SRC%\script\requirements.txt
+%SRC%\.env\Scripts\pip install -r %SRC%\script\requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple
 %SRC%\.env\Scripts\python %SRC%\project.py
