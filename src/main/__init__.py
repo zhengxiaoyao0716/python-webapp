@@ -19,6 +19,7 @@ app.static_folder = '../html/static'
 app.config.update(
     SECRET_KEY=SECRET_KEY,
     APPLICATION_ROOT=APP_ROOT + '/',
+    SESSION_COOKIE_PATH='/',
 )
 LOGGER.set_logger(app.logger)
 
