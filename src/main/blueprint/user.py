@@ -7,6 +7,7 @@
 from flask import Blueprint, g, session, make_response, jsonify
 
 from data import User
+from util import check_code
 
 blueprint = Blueprint('user', __name__)
 
