@@ -50,7 +50,7 @@ def update_password():
         g.data['old'], g.data['new'])
     if err:
         return err, 403
-    return 'fin'
+    return logout()
 
 
 @blueprint.route('/user/search')
