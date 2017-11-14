@@ -20,7 +20,7 @@
             window.socket = socket;
 
             const promise = (fn) =>
-                (...args) => new Promise(resolve => fn.call(socket, ...args, resolve));
+                (...args) => new Promise(resolve => fn.call(socket, ...args, (...args) => resolve(args)));
             window.promise = promise;
 
             const request = (url, data = undefined) => fetch(root + url, {
