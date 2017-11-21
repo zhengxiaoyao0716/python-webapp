@@ -23,7 +23,7 @@ def init_test_data():
 if __name__ == '__main__':
     import webbrowser
     from project import APP_ROOT, SOCKETIO, DB
-    from main import app
+    from main import app, g
     from data import drop_all, create_all
 
     init_test_data()
@@ -37,6 +37,7 @@ if __name__ == '__main__':
     def add_debug_ctx():
         """添加调试上下文"""
         # session['user'] = 1
+        g.debug = True
     webbrowser.open('http://localhost:5000%s/view' % APP_ROOT, new=0)
     if SOCKETIO:
         from main.socket import socketio

@@ -21,7 +21,7 @@ app.config.update(
     APPLICATION_ROOT=APP_ROOT + '/',
     SESSION_COOKIE_PATH='/',
 )
-LOGGER.set_logger(app.logger)
+LOGGER.inject_logger(app.logger)
 
 
 @app.before_request

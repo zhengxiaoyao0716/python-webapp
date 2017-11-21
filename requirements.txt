@@ -3,3 +3,4 @@ sqlalchemy
 PyMySQL
 passlib
 flask-socketio
+requests

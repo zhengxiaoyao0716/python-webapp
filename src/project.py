@@ -40,14 +40,19 @@ def immediate(*args, **kwargs):
 
 @immediate()
 def _environ_variables():
-    global APP_ROOT
-    global SECRET_KEY
-    global DB_CONNECT
+    global APP_ROOT  # 应用根路径
+    global SECRET_KEY  # 全局密钥
+    global DB_CONNECT  # 数据库连接
+    global ALI_SMS_ACCESS  # 阿里短信服务
     from os import environ
     APP_ROOT = environ.get('APP_ROOT', '/%s/%s' % (NAME, VERSION))
     SECRET_KEY = environ.get('SECRET_KEY', 'SECRET_KEY')
     # mysql+pymysql://{{account}}:{{password}}@{{serverIp}}:{{port}}/{{dbName}}?charset={{charset}}
     DB_CONNECT = environ.get('DB_CONNECT', 'sqlite:///.%s.db' % NAME)
+    ALI_SMS_ACCESS = environ.get(
+        'ALI_SMS_ACCESS',
+        'testId,testSecret',
+    ).split(',')
 
 
 @immediate(DB_CONNECT)
@@ -85,7 +90,7 @@ def _init_logger():
         @property
         def debug(self): return self.logger.debug
 
-        def set_logger(self, logger):
+        def inject_logger(self, logger):
             self.logger = logger
 
     LOGGER = Logger(type('Logger', (object,), {
@@ -101,10 +106,12 @@ CODE_USAGE = {
     '/guide/password/reset': {
         'text': '重置密码',
         'expiry': 3 * 60,
+        'cooldown': 60,
     },
     '/user/destroy': {
         'text': '销毁帐号',
         'expiry': 3 * 60,
+        'cooldown': 60,
     },
 }
 SOCKETIO = True

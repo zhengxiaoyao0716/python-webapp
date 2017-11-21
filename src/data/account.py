@@ -84,7 +84,11 @@ class User(Base):
         :return user, error
         """
         if account and password:
-            self = cls.query.filter(cls.account == account).one_or_none()
+            self = cls.query.filter(or_(
+                cls.account == account,
+                cls.email == account,
+                cls.phone == account,
+            )).one_or_none()
             if not self:
                 return None, u'帐号不存在'
             err = self.check_password(password)

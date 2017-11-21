@@ -8,7 +8,7 @@ from flask import Blueprint, g, request, session, jsonify, make_response
 
 from project import LOGGER, CODE_USAGE
 from data import DB, User
-from util import rand_code, get_time, check_code
+from util import send_sms, rand_code, get_time, check_code
 
 blueprint = Blueprint('guide', __name__)
 
@@ -55,37 +55,56 @@ def get_verify_code():
         .one_or_none()
     email = g.data.get('email')
     phone = g.data.get('phone')
-
+    if not email and not phone:
+        return '缺少邮箱和手机号', 400
     if user:
         # 用户已存在，若邮箱或手机号能够匹配，可以尝试重置
-        if not email and not phone:
-            return '账号已存在，请认证邮箱或手机', 403
         if email and user.email != email:
             return '账号已存在，尝试用邮箱认证但不匹配', 403
         if phone and user.phone != phone:
             return '账号已存在，尝试用手机认证但不匹配', 403
     else:
+        # 用户不存在，若邮箱或手机号未被占用，可以创建用户
+        if email and User.query.filter(User.email == email).first():
+            return '账号不存在，且该邮箱已被占用', 403
+        if phone and User.query.filter(User.phone == phone).first():
+            return '账号不存在，且该手机已被占用', 403
         user = User.append(account, None, None, email=email, phone=phone)
     DB.session.flush()
 
     extend = user.extend()
     _, expiry = extend \
         .pop(usage, '0,-1').split(',')
-    if expiry > get_time():
+    # 再次请求冷却时间
+    if expiry > get_time(second=conf['cooldown'] - conf['expiry']):
         return '请求验证码过于频繁，请稍候再试', 403
     code = rand_code()
     user.extend({
         **extend,
         usage: code + ',' + get_time(second=conf['expiry']),
     })
-    # TODO 发送验证码
-    LOGGER.info('%s %d %s', usage, user.id, code)
+    resp_tip = (' #DEBUG[%s]' % code) if 'debug' in g else ''
     if email:
-        pass
+        return '抱歉，我们暂未加入邮件验证支持', 501
     if phone:
-        pass
-
-    return 'fin'
+        r = send_sms(
+            phone,
+            '阿里云短信测试专用',
+            'SMS_71390007',
+            {'code': code},
+            '123')
+        if not r.ok:
+            LOGGER.error('SEND_SMS_FAILED: (%s, %d, %s), code: %d, reason: %s',
+                         usage, user.id, code, r.status_code, r.reason)
+            return r.reason + resp_tip, 406
+        data = r.json()
+        if data['Code'] != 'OK':
+            LOGGER.error('SEND_SMS_FAILED: (%s, %d, %s), ali sms response: %s',
+                         usage, user.id, code, r.text)
+            return data['Message'] + resp_tip, 406
+        LOGGER.info('SENS_SMS: (%s, %d, %s), ali request id: %s',
+                    usage, user.id, code, data['RequestId'])
+        return data['Message']
 
 
 @blueprint.route('/password/reset', methods=['POST'])

@@ -3,8 +3,8 @@ sqlalchemy
 PyMySQL
 passlib
 flask-socketio
+requests
 
 # dev
 flake8
 ipython
-requests
