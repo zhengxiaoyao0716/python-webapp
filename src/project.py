@@ -43,16 +43,24 @@ def _environ_variables():
     global APP_ROOT  # 应用根路径
     global SECRET_KEY  # 全局密钥
     global DB_CONNECT  # 数据库连接
-    global ALI_SMS_ACCESS  # 阿里短信服务
+    global ALI_SMS_ACCESS    # 阿里短信服务KeyId与Secret
+    global ALI_SMS_SIGN      # 阿里短信服务签名
+    global ALI_SMS_TEMPLATE  # 阿里短信服务模板ID
+
     from os import environ
+
     APP_ROOT = environ.get('APP_ROOT', '/%s/%s' % (NAME, VERSION))
+
     SECRET_KEY = environ.get('SECRET_KEY', 'SECRET_KEY')
     # mysql+pymysql://{{account}}:{{password}}@{{serverIp}}:{{port}}/{{dbName}}?charset={{charset}}
     DB_CONNECT = environ.get('DB_CONNECT', 'sqlite:///.%s.db' % NAME)
+
     ALI_SMS_ACCESS = environ.get(
         'ALI_SMS_ACCESS',
         'testId,testSecret',
     ).split(',')
+    ALI_SMS_SIGN = environ.get('ALI_SMS_SIGN', '阿里云短信测试专用')
+    ALI_SMS_TEMPLATE = environ.get('ALI_SMS_TEMPLATE', 'SMS_71390007')
 
 
 @immediate(DB_CONNECT)

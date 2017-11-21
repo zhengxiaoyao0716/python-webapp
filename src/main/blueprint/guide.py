@@ -6,7 +6,7 @@
 
 from flask import Blueprint, g, request, session, jsonify, make_response
 
-from project import LOGGER, CODE_USAGE
+from project import LOGGER, CODE_USAGE, ALI_SMS_SIGN, ALI_SMS_TEMPLATE
 from data import DB, User
 from util import send_sms, rand_code, get_time, check_code
 
@@ -89,10 +89,9 @@ def get_verify_code():
     if phone:
         r = send_sms(
             phone,
-            '阿里云短信测试专用',
-            'SMS_71390007',
-            {'code': code},
-            '123')
+            ALI_SMS_SIGN,
+            ALI_SMS_TEMPLATE,
+            {'usage': conf['text'], 'code': code})
         if not r.ok:
             LOGGER.error('SEND_SMS_FAILED: (%s, %d, %s), code: %d, reason: %s',
                          usage, user.id, code, r.status_code, r.reason)
