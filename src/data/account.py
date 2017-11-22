@@ -66,7 +66,7 @@ class User(Base):
     def check_password(self, password):
         """检查密码，return error"""
         if self.secret is None:
-            return u'帐号未激活'
+            return u'账号未激活'
         if not pwd_context.verify(password, self.secret):
             return u'密码错误'
 
@@ -90,7 +90,7 @@ class User(Base):
                 cls.phone == account,
             )).one_or_none()
             if not self:
-                return None, u'帐号不存在'
+                return None, u'账号不存在'
             err = self.check_password(password)
             if err:
                 return None, err
@@ -136,9 +136,9 @@ class User(Base):
 
     def destroy(self):
         """
-        销毁帐号
+        销毁账号
         请不要试图进行复杂的级联配置，
-        所有与帐号关联字段应当显式的销毁
+        所有与账号关联字段应当显式的销毁
         """
         UserExtend.query.filter(UserExtend.user_id == self.id).delete()
         DB.session.delete(self)
@@ -149,7 +149,8 @@ class UserExtend(Base):
     __tablename__ = 'user_extend'
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'),
+                     unique=True, nullable=False)
     _data = Column(String, nullable=False)
 
     def __init__(self, user_id, data):

@@ -31,7 +31,7 @@ def rand_code(size=6, chars=ascii_uppercase + digits):
 def check_code(user, usage, code):
     """校验验证码，失败返回错误原因"""
     if not user:
-        return '帐号不存在'
+        return '账号不存在'
     extend = user.extend()
     _code, expiry = extend \
         .pop(usage, '0,-1').split(',')

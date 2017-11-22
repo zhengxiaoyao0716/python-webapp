@@ -110,7 +110,7 @@ def get_verify_code():
 def reset_password():
     """
     重置密码
-    : 若帐号未激活，则直接设置为新密码并激活
+    : 若账号未激活，则直接设置为新密码并激活
     """
     user = User.query.filter(User.account == g.data['account']).one_or_none()
     err = check_code(user, '/guide/password/reset', g.data['code'])

@@ -10,6 +10,9 @@ os.sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 
 def init_test_data():
+    print('', flush=True)
+    print('INIT_TEST_DATA:', flush=True)
+
     from data import User
     drop_all()
     create_all()
@@ -17,7 +20,9 @@ def init_test_data():
     DB.session.flush()
     u.extend({'manager': True})
     DB.session.commit()
-    print(u.simple(), flush=True)
+    print(u.simple(), u.extend(), flush=True)
+
+    print('', flush=True)
 
 
 if __name__ == '__main__':
@@ -90,5 +95,9 @@ def test_user():
          {'account': 'zheng', 'password': 'password'})
     post('/user/password/update',
          {'old': 'password', 'new': 'password'})
-    print(get('/user/user/search?keyword=zheng').json(), flush=True)
+    post('/guide/login',
+         {'account': 'zheng', 'password': 'password'})
+    print(get('/user/user/search?keyword=zheng').json())
+    print('')
+
     get('/user/logout')

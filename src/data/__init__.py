@@ -6,7 +6,8 @@
 
 # flake8: noqa
 from project import DB
-from .account import Base, User
+from .base import Base
+from .account import User
 
 
 def create_all():

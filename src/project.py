@@ -117,7 +117,7 @@ CODE_USAGE = {
         'cooldown': 60,
     },
     '/user/destroy': {
-        'text': '销毁帐号',
+        'text': '销毁账号',
         'expiry': 3 * 60,
         'cooldown': 60,
     },

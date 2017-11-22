@@ -35,11 +35,13 @@ def logout():
 
 @blueprint.route('/destroy', methods=['POST'])
 def destroy():
-    """销毁帐号"""
+    """销毁账号"""
     err = check_code(g.user, '/user/destroy', g.data['code'])
     if err:
         return err, 403
-    g.user.destroy()
+    err = g.user.destroy()
+    if err:
+        return err, 403
     return logout()
 
 
